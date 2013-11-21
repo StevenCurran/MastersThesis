@@ -1,14 +1,19 @@
 load mnist_uint8;
 
-train_x = double(train_x)/255;
+%train_x = double(train_x)/255;
 test_x  = double(test_x)/255;
-train_y = double(train_y);
+%train_y = double(train_y);
 test_y  = double(test_y);
 
 %%  ex1 train a 100 hidden unit SDAE and use it to initialize a FFNN
 %  Setup and train a stacked denoising autoencoder (SDAE)
 
 s = loadAllDigitsIntoStruct(test_x, test_y);
+
+%lets hide one digit that we are gonna classify
+imageToClassify = s.f8(1,:);
+s.f8 = s.f8(3:end,:);
+
 test = vertcat(s.f0, s.f8);
 labels = createLabelVector([length(s.f0) length(s.f8)],['0' '8']);
 
@@ -39,14 +44,15 @@ SVMStruct = svmtrain(activations1,labels);
 
 %Test the SVM
 input = s.f8(1,:);
-activations2 = sigm(input * sae.ae{1}.W{2}(:,2:end));
+activations2 = sigm(imageToClassify * sae.ae{1}.W{2}(:,2:end));
 %[1 , size of hidden]
 %pass to svmtest
 %return the label
 
 digit = svmclassify(SVMStruct,activations2,'showplot',true)
 hold on;
-plot('ro','MarkerSize',12);hold off
+plot(100,100,'ro','MarkerSize',12);
+hold off
 
 
 

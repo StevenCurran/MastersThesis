@@ -38,22 +38,21 @@ SVMStruct = svmtrain(activations1,labels);
 %Load in a new image
 
 %Test the SVM
-input = s.f8(1,:);
+input = s.f0(1,:);
 activations2 = sigm(input * sae.ae{1}.W{2}(:,2:end));
 %[1 , size of hidden]
 %pass to svmtest
 %return the label
 
 digit = svmclassify(SVMStruct,activations2,'showplot',true)
-hold on;
-plot('ro','MarkerSize',12);hold off
+hold on;plot(5,2,'ro','MarkerSize',12);hold off
 
 
 
 
 %nn = nntrain(nn, test, labels, opts);
 
-%[er, bad] = nntest(nn, test_x, test_y);
+[er, bad] = nntest(nn, test_x, test_y);
 %assert(er < 0.16, 'Too big error');
 
 

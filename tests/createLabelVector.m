@@ -18,8 +18,8 @@ end
 function [labelVector] = genLabelVector(label)
     switch(label)
         case '0'
-            labelVector = [0 1]
+            labelVector = [0] % [0 1]
         case '8'
-            labelVector = [1 0]
+            labelVector = [1]
     end
 end

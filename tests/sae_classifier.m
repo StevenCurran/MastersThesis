@@ -31,7 +31,7 @@ opts.batchsize = 1;
 sae = saetrain(sae, test, opts);
 visualize(sae.ae{1}.W{1}(:,2:end)')
 
-
+sae;
 %Trains the SVM
 
 %activations = sigm(input * nn.W{i - 1}');

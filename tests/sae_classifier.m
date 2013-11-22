@@ -11,11 +11,12 @@ test_y  = double(test_y);
 s = loadAllDigitsIntoStruct(test_x, test_y);
 
 %lets hide one digit that we are gonna classify
-imageToClassify = s.f8(1,:);
-s.f8 = s.f8(3:end,:);
+for index=1:3
+imageToClassify = s.f8(index,:);
+s.f8 = s.f8([1:index-1 index+1:end],:);
 
-test = vertcat(s.f0, s.f8);
-labels = createLabelVector([length(s.f0) length(s.f8)],['0' '8']);
+test = vertcat(s.f0, s.f8, s.f2);
+labels = createLabelVector([length(s.f0) length(s.f8) length(s.f2)],['0' '8' '2']);
 
 %training = datasample(test,784);
 rand('state',0)
@@ -38,7 +39,7 @@ visualize(sae.ae{1}.W{1}(:,2:end)')
 %activations1 = sigm(test * sae.ae{1}.W{1}(:,2:end));
 
 activations1 = getActivations(sae.ae{1}, test);
-max(activations1)';
+
 
 %- When computing the activations you are forgetting the bias term. This happens on line 9 of nnff.m where a 1 is appended to all training examples. 
 
@@ -46,26 +47,33 @@ max(activations1)';
 
 %[size of test , size of hidden]
 %pass to svmtrain with labels
-SVMStruct = svmtrain(activations1,labels,'showplot',true);
+%SVMStruct = svmtrain(activations1,labels,'showplot',true);
 %try with lib svm
-%SVMStruct = svmtrain(activations1,labels,[]);
+SVMStruct = svmtrain(labels,activations1,[]);
 
 
 %Load in a new image
 
-%Test the SVM
-input = s.f8(1,:);
-activations2 = sigm(imageToClassify * sae.ae{1}.W{1}(:,2:end)');
+
+activations2 = getActivations(sae.ae{1}, imageToClassify);
 %[1 , size of hidden]
 %pass to svmtest
 %return the label
 
-%predicted_label = svmpredict(labels, activations2, SVMStruct, []);
+[predicted_label, accuracy, decision_values/prob_estimates] = svmpredict([8], activations2, SVMStruct, []);
 
-digit = svmclassify(SVMStruct,activations2,'showplot',true)
-
-hold on;
-plot(100,100,'ro','MarkerSize',12);
-hold off
+AccuVector(index)=accuracy;
+%digit = svmclassify(SVMStruct,activations2);
+end
 
 
+figure
+plot([1:10],AccuVector)
+hold on
+plot([1:10],AccuVector*1.3,'r')
+
+
+%plot individual numbers
+figure
+ii=reshape(imageToClassify,[28 28])
+imagesc(ii')

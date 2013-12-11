@@ -22,12 +22,13 @@ rand('state',0)
 %sae = saesetup([784 100]);
 sae = saesetup([size(test,2) 100]);
 sae.ae{1}.activation_function       = 'sigm';
-sae.ae{1}.learningRate              = 0.1;
+sae.ae{1}.learningRate              = 0.05;
 sae.ae{1}.inputZeroMaskedFraction   = 0.5;
 opts.numepochs =   3;
 opts.batchsize = 1;
 %sae = saetrain(sae, train_x, opts);
-sae = saetrain(sae, train_x, opts);
+sae = saetrain(sae, train_x, opts); %to stack this we pass in the activations from
+% the previous autoencoder, instead of train.
 visualize(sae.ae{1}.W{1}(:,2:end)')
 
 sae;

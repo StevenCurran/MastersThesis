@@ -37,6 +37,9 @@ function nn = nnff(nn, x, y)
         %Add the bias term
         nn.a{i} = [ones(m,1) nn.a{i}];
     end
+    
+    
+    %Save the output to verify my output fn
     switch nn.output 
         case 'sigm'
             nn.a{n} = sigm(nn.a{n - 1} * nn.W{n - 1}');

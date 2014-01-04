@@ -20,7 +20,7 @@ cnn.layers = {
 cnn = cnnsetup(cnn, train_x, train_y);
 
 opts.alpha = 1;
-opts.batchsize = 50;
+opts.batchsize = 641;
 opts.numepochs = 1;
 
 cnn = cnntrain(cnn, train_x, train_y, opts);

@@ -1,7 +1,7 @@
 load images.mat
 
-train_x = ConvertFromCellArray(imagesMap.values);
-train_y = zeros(1);
+train_x = ConvertFromCellArray(images);
+train_y = zeros(2,length(train_x));
 
 %% ex1 Train a 6c-2s-12c-2s Convolutional neural network 
 %will run 1 epoch in about 200 second and get around 11% error. 
@@ -17,7 +17,8 @@ cnn.layers = {
 cnn = cnnsetup(cnn, train_x, train_y);
 
 opts.alpha = 1;
-opts.batchsize = 50;
+div = divisor(length(train_x));
+opts.batchsize = div(ceil(end/2)+1);
 opts.numepochs = 1;
 
 cnn = cnntrain(cnn, train_x, train_y, opts);

@@ -1,6 +1,6 @@
-load images.mat
+[people, nonPeople] = GetImages();
 
-train_x = ConvertFromCellArray(images);
+train_x = people;
 train_y = zeros(2,length(train_x));
 
 %% ex1 Train a 6c-2s-12c-2s Convolutional neural network 

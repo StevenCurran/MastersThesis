@@ -2,8 +2,8 @@
 
 [train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople);
 
-train_x = people;
-train_y = zeros(2,length(train_x));
+%train_x = people;
+%train_y = zeros(2,length(train_x));
 
 %% ex1 Train a 6c-2s-12c-2s Convolutional neural network 
 %will run 1 epoch in about 200 second and get around 11% error. 

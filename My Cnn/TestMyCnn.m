@@ -1,5 +1,7 @@
 [people, nonPeople] = GetImages();
 
+[train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople);
+
 train_x = people;
 train_y = zeros(2,length(train_x));
 

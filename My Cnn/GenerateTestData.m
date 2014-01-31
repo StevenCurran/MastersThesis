@@ -26,10 +26,28 @@ end
 
 train_x = cat(3, people_train, non_people_train);
 shuffle = randperm(length(train_x))
+%%shuffle the data, ensuring the labels are in the same order as the class
+train_x = train_x(:,:,shuffle);
+train_y = train_y(:,shuffle);
 
 
-train_x = nonPeople(:,:,1:num_people);
-test = nonPeople(:,:,num_people:end);
+people_test = people(:,:,1:num_people_test);
+non_people_test = nonPeople(:,:,1:num_non_people_test);
+
+%%need to generate the label vector in here... 
+test_y = [];
+for i = 1 : length(people_test)
+    test_y = horzcat(test_y, [0 ; 1]);
+end
+
+for i = 1 : length(non_people_test)
+    test_y = horzcat(test_y, [1 ; 0]);
+end
+
+test_x = cat(3, people_test, non_people_test);
+shuffle = randperm(length(test_x))
+test_x = test_x(:,:,shuffle);
+test_y = test_y(:,shuffle);
 
 
 

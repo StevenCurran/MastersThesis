@@ -25,7 +25,7 @@ for i = 1 : length(non_people_train)
 end
 
 train_x = cat(3, people_train, non_people_train);
-shuffle = randperm(length(train_x))
+shuffle = randperm(length(train_x));
 %%shuffle the data, ensuring the labels are in the same order as the class
 train_x = train_x(:,:,shuffle);
 train_y = train_y(:,shuffle);
@@ -45,7 +45,7 @@ for i = 1 : length(non_people_test)
 end
 
 test_x = cat(3, people_test, non_people_test);
-shuffle = randperm(length(test_x))
+shuffle = randperm(length(test_x));
 test_x = test_x(:,:,shuffle);
 test_y = test_y(:,shuffle);
 

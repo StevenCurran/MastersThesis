@@ -1,6 +1,11 @@
+tic
 [people, nonPeople] = GetImages();
+disp('Images Retrieved')
 
 [train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople);
+%data is in the wrong format, must convert.
+train_x = 
+disp('Generating Test Data')
 
 %train_x = people;
 %train_y = zeros(2,length(train_x));
@@ -17,6 +22,7 @@ cnn.layers = {
     struct('type', 's', 'scale', 2) %subsampling layer
 };
 cnn = cnnsetup(cnn, train_x, train_y);
+disp('CNN Constructed')
 
 opts.alpha = 1;
 div = divisor(length(train_x));
@@ -24,8 +30,11 @@ opts.batchsize = div(ceil(end/2)+1);
 opts.numepochs = 3;
 
 cnn = cnntrain(cnn, train_x, train_y, opts);
-save('cnn.mat','cnn'); %Warning this is going to be massive.
+disp('CNN Trained')
 
+save('cnn.mat','cnn'); %Warning this is going to be massive.
+disp('CNN Saved')
+toc
 [er, bad] = cnntest(cnn, test_x, test_y);
 
 %plot mean squared error

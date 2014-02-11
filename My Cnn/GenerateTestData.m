@@ -1,8 +1,8 @@
 function [train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople)
 
 %Create an 80 20 split of the data.
-TRAINING_PERCENTAGE = 0.8;
-TESTING_PERCENTAGE = 0.2;
+TRAINING_PERCENTAGE = 0.95;
+TESTING_PERCENTAGE = 0.05;
 
 
 num_people_train = length(people) * TRAINING_PERCENTAGE;

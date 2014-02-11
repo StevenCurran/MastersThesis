@@ -3,8 +3,6 @@ tic
 disp('Images Retrieved')
 
 [train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople);
-%data is in the wrong format, must convert.
-train_x = 
 disp('Generating Test Data')
 
 %train_x = people;
@@ -16,9 +14,9 @@ disp('Generating Test Data')
 rand('state',0)
 cnn.layers = {
     struct('type', 'i') %input layer
-    struct('type', 'c', 'outputmaps', 6, 'kernelsize', 5) %convolution layer
+    struct('type', 'c', 'outputmaps', 6, 'kernelsize', 15) %convolution layer
     struct('type', 's', 'scale', 2) %sub sampling layer
-    struct('type', 'c', 'outputmaps', 12, 'kernelsize', 5) %convolution layer
+    struct('type', 'c', 'outputmaps', 12, 'kernelsize', 15) %convolution layer
     struct('type', 's', 'scale', 2) %subsampling layer
 };
 cnn = cnnsetup(cnn, train_x, train_y);

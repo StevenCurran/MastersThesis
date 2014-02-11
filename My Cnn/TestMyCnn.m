@@ -21,9 +21,10 @@ cnn = cnnsetup(cnn, train_x, train_y);
 opts.alpha = 1;
 div = divisor(length(train_x));
 opts.batchsize = div(ceil(end/2)+1);
-opts.numepochs = 1;
+opts.numepochs = 3;
 
 cnn = cnntrain(cnn, train_x, train_y, opts);
+save('cnn.mat','cnn'); %Warning this is going to be massive.
 
 [er, bad] = cnntest(cnn, test_x, test_y);
 

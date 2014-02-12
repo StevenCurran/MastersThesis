@@ -8,9 +8,7 @@ disp('Generating Test Data')
 %train_x = people;
 %train_y = zeros(2,length(train_x));
 
-%% ex1 Train a 6c-2s-12c-2s Convolutional neural network 
-%will run 1 epoch in about 200 second and get around 11% error. 
-%With 100 epochs you'll get around 1.2% error
+%% height = 124 width = 76
 rand('state',0)
 cnn.layers = {
     struct('type', 'i') %input layer
@@ -22,15 +20,15 @@ cnn.layers = {
 cnn = cnnsetup(cnn, train_x, train_y);
 disp('CNN Constructed')
 
-opts.alpha = 1;
+opts.alpha = 0.2;
 div = divisor(length(train_x));
 opts.batchsize = div(ceil(end/2)+1);
-opts.numepochs = 3;
+opts.numepochs = 1;
 
 cnn = cnntrain(cnn, train_x, train_y, opts);
 disp('CNN Trained')
-
-save('cnn.mat','cnn'); %Warning this is going to be massive.
+clear train_x train_y
+%save('cnn.mat','cnn'); Warning this is going to be massive.
 disp('CNN Saved')
 toc
 [er, bad] = cnntest(cnn, test_x, test_y);

@@ -49,11 +49,7 @@ end
 mu = mean(X); 
 X = bsxfun(@minus, X, mu);
 A = X'*X;
-<<<<<<< HEAD
 [V,D,notused] = svd(A);
-=======
-[V,D,~] = svd(A);
->>>>>>> 5940c8fe7b3f3830b73e391724d1e567d904063c
 whMat = sqrt(size(X,1)-1)*V*sqrtm(inv(D + eye(size(D))*epsilon))*V';
 Xwh = X*whMat;  
 invMat = pinv(whMat);

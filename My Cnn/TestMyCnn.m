@@ -3,9 +3,16 @@ tic
 disp('Images Retrieved')
 
 zcaPeople = reshape(people, 124*76, length(people));
-whiten = whiten(zcaPeople, 0.0001);
+whitenPeople = whiten(zcaPeople, 0.0001);
+whitenPeople = reshape(whitenPeople, 124,76,length(people));
 
-[train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople);
+zcaNonPeople = reshape(nonPeople, 124*76, length(nonPeople));
+whitenNonPeople = whiten(zcaNonPeople, 0.0001);
+whitenNonPeople = reshape(whitenNonPeople, 124,76,length(nonPeople));
+
+
+
+[train_x, train_y, test_x, test_y] = GenerateTestData(whitenPeople, whitenNonPeople);
 disp('Generating Test Data')
 
 %train_x = people;

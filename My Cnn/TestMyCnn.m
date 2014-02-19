@@ -2,6 +2,9 @@ tic
 [people, nonPeople] = GetImages();
 disp('Images Retrieved')
 
+zcaPeople = reshape(people, 124*76, length(people));
+whiten = whiten(zcaPeople, 0.0001);
+
 [train_x, train_y, test_x, test_y] = GenerateTestData(people, nonPeople);
 disp('Generating Test Data')
 

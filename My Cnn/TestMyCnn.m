@@ -3,11 +3,11 @@ tic
 disp('Images Retrieved')
 
 zcaPeople = reshape(people, 124*76, length(people));
-whitenPeople = whiten(zcaPeople, 0.0001);
+whitenPeople = zcaWhiten(zcaPeople);
 whitenPeople = reshape(whitenPeople, 124,76,length(people));
 
 zcaNonPeople = reshape(nonPeople, 124*76, length(nonPeople));
-whitenNonPeople = whiten(zcaNonPeople, 0.0001);
+whitenNonPeople = zcaWhiten(zcaNonPeople);
 whitenNonPeople = reshape(whitenNonPeople, 124,76,length(nonPeople));
 
 
@@ -30,10 +30,10 @@ cnn.layers = {
 cnn = cnnsetup(cnn, train_x, train_y);
 disp('CNN Constructed')
 
-opts.alpha = 0.2;
+opts.alpha = 0.5;
 div = divisor(length(train_x));
 opts.batchsize = div(ceil(end/2)+1);
-opts.numepochs = 1;
+opts.numepochs = 10;
 
 cnn = cnntrain(cnn, train_x, train_y, opts);
 disp('CNN Trained')

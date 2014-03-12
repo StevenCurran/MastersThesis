@@ -1,17 +1,18 @@
 function [] = DisplayPeds()
 
 frameNumber = 10;
-boxH = 52;
-boxW = 32;
+boxH = 150;
+boxW = 80;
 
 movie = VideoReader('TownCentreXVID.avi');
 frame = read(movie, frameNumber);
+colorFrame = frame;
 frame = rgb2gray(frame);
 
 framesMap = containers.Map;
 
 %get all the frames from the image...
-for h = 1 :-0.2:0.2
+for h = 1 : 1
     scaledFrame = imresize(frame, h);
     for i = 1 : 15 :(size(scaledFrame, 1) - boxH)
         for j = 1 : 15 :(size(scaledFrame , 2)-boxW)
@@ -32,10 +33,25 @@ whitenPeople = reshape(whitenPeople, boxH,boxW,length(testImages));
 keys = framesMap.keys();
 xy = strsplit(keys{100}, ':')
 
+smallerPeople = imresize(whitenPeople, [52 32]);
+
 net = cnnff(cnn, whitenPeople);
 
+estimate = find(net.o(2,:) > 0.95);
 
+figure;
+imshow(colorFrame);
+hold on;
 
+for es = 1 : length(estimate)
+    xy = strsplit(keys{es}, ':')
+    x = str2num(xy{2});
+    y = str2num(xy{3});
+    rectangle('Position', [x, y,boxW, boxH]);
+    
+end
+
+hold off;
 
 
 

@@ -18,6 +18,10 @@ for h = 1 : 1
         for j = 1 : 15 :(size(scaledFrame , 2)-boxW)
             image = scaledFrame(i:i+boxH-1, j:j+boxW-1);
             image = double(image)/255;
+            if(i>900)
+                disp(i);
+            end
+            
             framesMap([num2str(h) ':' num2str(i) ':' num2str(j)]) = image;
         end
     end
@@ -31,23 +35,23 @@ whitenPeople = reshape(whitenPeople, boxH,boxW,length(testImages));
 
 
 keys = framesMap.keys();
-xy = strsplit(keys{100}, ':')
 
 smallerPeople = imresize(whitenPeople, [52 32]);
 
-net = cnnff(cnn, whitenPeople);
+net = cnnff(cnn, smallerPeople);
 
 estimate = find(net.o(2,:) > 0.95);
 
 figure;
 imshow(colorFrame);
+axis on;
 hold on;
 
-for es = 1 :length(estimate)
+for es = 1 : length(estimate)
     xy = strsplit(keys{estimate(es)}, ':')
-    x = str2num(xy{2});
-    y = str2num(xy{3});
-    rectangle('Position', [x, y,boxW, boxH]);
+    x = str2double(xy{2});
+    y = str2double(xy{3});
+   rectangle('Position', [x-boxW, y-boxH,boxW, boxH], 'Tag' , 'hello');
     
 end
 

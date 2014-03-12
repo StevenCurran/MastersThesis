@@ -40,12 +40,21 @@ smallerPeople = imresize(whitenPeople, [52 32]);
 
 net = cnnff(cnn, smallerPeople);
 
-estimate = find(net.o(2,:) > 0.95);
+estimate = find(net.o(2,:) > 0.99);
 
 figure;
 imshow(colorFrame);
 axis on;
 hold on;
+
+for es = 1 : length(keys)
+    xy = strsplit(keys{es}, ':');
+    x = str2double(xy{2});
+    y = str2double(xy{3});
+   plot(x,y,'r');
+    
+end
+
 
 for es = 1 : length(estimate)
     xy = strsplit(keys{estimate(es)}, ':')

@@ -43,8 +43,8 @@ figure;
 imshow(colorFrame);
 hold on;
 
-for es = 1 : length(estimate)
-    xy = strsplit(keys{es}, ':')
+for es = 1 :length(estimate)
+    xy = strsplit(keys{estimate(es)}, ':')
     x = str2num(xy{2});
     y = str2num(xy{3});
     rectangle('Position', [x, y,boxW, boxH]);

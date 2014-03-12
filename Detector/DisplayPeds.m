@@ -40,7 +40,7 @@ smallerPeople = imresize(whitenPeople, [52 32]);
 
 net = cnnff(cnn, smallerPeople);
 
-estimate = find(net.o(2,:) > 0.99);
+estimate = find(net.o(2,:) > 0.9);
 
 figure;
 imshow(colorFrame);
@@ -51,7 +51,7 @@ for es = 1 : length(keys)
     xy = strsplit(keys{es}, ':');
     x = str2double(xy{2});
     y = str2double(xy{3});
-   plot(x,y,'r');
+   plot(y,x,'r');
     
 end
 
@@ -60,7 +60,7 @@ for es = 1 : length(estimate)
     xy = strsplit(keys{estimate(es)}, ':')
     x = str2double(xy{2});
     y = str2double(xy{3});
-   rectangle('Position', [x-boxW, y-boxH,boxW, boxH], 'Tag' , 'hello');
+   rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
     
 end
 

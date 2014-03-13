@@ -1,6 +1,6 @@
-function [] = DisplayPeds()
+function [] = DisplayPeds(cnn)
 
-frameNumber = 20;
+frameNumber = 600;
 boxH = 150;
 boxW = 80;
 
@@ -60,7 +60,7 @@ hold on;
 
 
 for es = 1 : length(estimate)
-    xy = strsplit(keys{estimate(es)}, ':')
+    xy = strsplit(keys{estimate(es)}, ':');
     x = str2double(xy{2});
     y = str2double(xy{3});
    rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');

@@ -43,7 +43,7 @@ whitenPeople = whitenPeople(:,:,1:5:end);
 
 net = cnnff(cnn, whitenPeople);
 
-estimate = find(net.o(2,:) > 0.95);
+estimate = find(net.o(2,:) > 0.9);
 
 figure;
 imshow(colorFrame);
@@ -58,12 +58,35 @@ hold on;
 %     
 % end
 
-
+colorcode=['y';'c';'b'];
 for es = 1 : length(estimate)
     xy = strsplit(keys{estimate(es)}, ':');
     x = str2double(xy{2});
     y = str2double(xy{3});
-   rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
+    
+    %//multiply / divide by the scale (xy{1}) for x, y, and boxW, boxH
+   h=rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
+   
+   if net.o(2,estimate(es))>0.99
+       col=colorcode(3);
+   elseif net.o(2,estimate(es))>0.95
+       col=colorcode(2);
+   else
+       col=colorcode(1);
+   end
+   set(h,'EdgeColor',col)
+    
+end
+
+for es = 1 : length(net.o(2,:))
+    xy = strsplit(keys{es}, ':');
+    x = str2double(xy{2});
+    y = str2double(xy{3});
+    x2 = ceil(x/15);
+    y2 = ceil(y/15);
+    map(y2,x2)=net.o(2,es);
+    
+ %  rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
     
 end
 

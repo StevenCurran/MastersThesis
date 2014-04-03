@@ -1,6 +1,6 @@
 function [] = DisplayPeds(cnn)
 
-frameNumber = 600;
+frameNumber = 10;
 boxH = 150;
 boxW = 80;
 
@@ -33,6 +33,12 @@ testImages = ConvertFromCellArray(framesMap.values);
 % whitenPeople = reshape(whitenPeople, boxH,boxW,length(testImages));
 
 zcaPeople = reshape(testImages, 52*32, length(testImages));
+
+for i = 1:length(zcaPeople)
+    %whitenPeople(i) = zcaWhiten(zcaPeople(i,:));
+    whitenPeople(i,:) = 10;
+end
+
 whitenPeople = zcaWhiten(zcaPeople);
 whitenPeople = reshape(whitenPeople, 52,32,length(testImages));
 
@@ -85,10 +91,11 @@ for es = 1 : length(net.o(2,:))
     x2 = ceil(x/15);
     y2 = ceil(y/15);
     map(y2,x2)=net.o(2,es);
-    
- %  rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
-    
+ %rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
 end
+
+
+
 
 hold off;
 

@@ -56,14 +56,15 @@ imshow(colorFrame);
 axis on;
 hold on;
 
-% for es = 1 : length(keys)
-%     xy = strsplit(keys{es}, ':');
-%     x = str2double(xy{2});
-%     y = str2double(xy{3});
-%    plot(y,x,'r');
-%     
-% end
+for es = 1 : length(keys)
+    xy = strsplit(keys{es}, ':');
+    x = str2double(xy{2});
+    y = str2double(xy{3});
+   plot(y,x,'r');
+    
+end
 
+boxes = [];
 colorcode=['y';'c';'b'];
 for es = 1 : length(estimate)
     xy = strsplit(keys{estimate(es)}, ':');
@@ -72,6 +73,7 @@ for es = 1 : length(estimate)
     
     %//multiply / divide by the scale (xy{1}) for x, y, and boxW, boxH
    h=rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
+   boxes = vertcat(boxes, [x,y,x+boxW,y+boxH]);
    
    if net.o(2,estimate(es))>0.99
        col=colorcode(3);
@@ -84,24 +86,34 @@ for es = 1 : length(estimate)
     
 end
 
+%boxes = [];
 for es = 1 : length(net.o(2,:))
     xy = strsplit(keys{es}, ':');
     x = str2double(xy{2});
     y = str2double(xy{3});
-    x2 = ceil(x/15);
+    x2 = ceil(x/15); % this is the dimenson of the box
     y2 = ceil(y/15);
     map(y2,x2)=net.o(2,es);
+%    boxes = vertcat(boxes, [x,y,x2,y2]);
+    
  %rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
 end
-
-
-
 
 hold off;
 
 
+finalBoxes = nms(boxes, 0.4);
 
+figure;
+imshow(colorFrame);
+hold on;
+for es = 1 : length(finalBoxes)
+    y = finalBoxes(es, 1); 
+    x = finalBoxes(es, 2); 
+    h=rectangle('Position', [x, y,boxW, boxH], 'Tag' , 'hello');
+end
 
+hold off;
 
 end
 

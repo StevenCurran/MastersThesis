@@ -12,8 +12,9 @@ frame = rgb2gray(frame);
 framesMap = containers.Map;
 
 %get all the frames from the image...
-for h = 1 : 1
-    scaledFrame = imresize(frame, h);
+scales = [0.25 0.5 1]
+for h = 1 : length(scales)
+    scaledFrame = imresize(frame, scales(h));
     for i = 1 : 5 :(size(scaledFrame, 1) - boxH)
         for j = 1 : 5 :(size(scaledFrame , 2)-boxW)
             image = scaledFrame(i:i+boxH-1, j:j+boxW-1);

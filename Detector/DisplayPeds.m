@@ -15,7 +15,7 @@ frame = rgb2gray(frame);
 framesMap = containers.Map;
 
 %get all the frames from the image...
-scales = [0.25 0.5]
+scales = [0.125 0.25 0.5]
 for h = 1 : length(scales)
     scaledFrame = imresize(frame, scales(h));
     for i = 1 : 5 :(size(scaledFrame, 1) - boxH)
@@ -48,8 +48,8 @@ whitenPeople = reshape(whitenPeople, 52,32,length(testImages));
 
 keys = framesMap.keys();
 
-keys = keys(1:5:end);
-whitenPeople = whitenPeople(:,:,1:5:end);
+% keys = keys(1:5:end);
+% whitenPeople = whitenPeople(:,:,1:5:end);
 
 net = cnnff(cnn, whitenPeople);
 

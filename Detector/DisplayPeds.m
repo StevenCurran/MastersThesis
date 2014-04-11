@@ -1,6 +1,6 @@
-function [] = DisplayPeds(cnn)
+function [] = DisplayPeds(cnn, frame)
 
-frameNumber = 10;
+frameNumber = frame;
 boxH = 150;
 boxW = 80;
 
@@ -51,16 +51,16 @@ net = cnnff(cnn, whitenPeople);
 
 estimate = find(net.o(2,:) > 0.9);
 
-figure;
-imshow(colorFrame);
-axis on;
-hold on;
+%figure;
+%imshow(colorFrame);
+%axis on;
+%hold on;
 
 for es = 1 : length(keys)
     xy = strsplit(keys{es}, ':');
     x = str2double(xy{2});
     y = str2double(xy{3});
-   plot(y,x,'r');
+ %  plot(y,x,'r');
     
 end
 
@@ -72,7 +72,7 @@ for es = 1 : length(estimate)
     y = str2double(xy{3});
     
     %//multiply / divide by the scale (xy{1}) for x, y, and boxW, boxH
-   h=rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
+  % h=rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
    boxes = vertcat(boxes, [x,y,x+boxW,y+boxH]);
    
    if net.o(2,estimate(es))>0.99
@@ -82,7 +82,7 @@ for es = 1 : length(estimate)
    else
        col=colorcode(1);
    end
-   set(h,'EdgeColor',col)
+%   set(h,'EdgeColor',col)
     
 end
 
@@ -102,7 +102,7 @@ end
 hold off;
 
 
-finalBoxes = nms(boxes, 0.4);
+finalBoxes = nms(boxes, 0.5);
 
 figure;
 imshow(colorFrame);
@@ -111,9 +111,13 @@ for es = 1 : length(finalBoxes)
     y = finalBoxes(es, 1); 
     x = finalBoxes(es, 2); 
     h=rectangle('Position', [x, y,boxW, boxH], 'Tag' , 'hello');
+    set(h,'EdgeColor','r')
 end
 
 hold off;
+
+saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
+ 
 
 end
 

@@ -4,6 +4,9 @@ frameNumber = frame;
 boxH = 150;
 boxW = 80;
 
+boxH = 52;
+boxW = 32;
+
 movie = VideoReader('TownCentreXVID.avi');
 frame = read(movie, frameNumber);
 colorFrame = frame;
@@ -12,15 +15,15 @@ frame = rgb2gray(frame);
 framesMap = containers.Map;
 
 %get all the frames from the image...
-scales = [0.25 0.5 1]
+scales = [0.25 0.5]
 for h = 1 : length(scales)
     scaledFrame = imresize(frame, scales(h));
     for i = 1 : 5 :(size(scaledFrame, 1) - boxH)
         for j = 1 : 5 :(size(scaledFrame , 2)-boxW)
             image = scaledFrame(i:i+boxH-1, j:j+boxW-1);
             image = double(image)/255;
-            image = imresize(image, [52 32]);
-            framesMap([num2str(h) ':' num2str(i) ':' num2str(j)]) = image;
+            %image = imresize(image, [52 32]);
+            framesMap([num2str(scales(h)) ':' num2str(i) ':' num2str(j)]) = image;
         end
     end
 end
@@ -52,29 +55,30 @@ net = cnnff(cnn, whitenPeople);
 
 estimate = find(net.o(2,:) > 0.9);
 
-%figure;
-%imshow(colorFrame);
-%axis on;
-%hold on;
-
-for es = 1 : length(keys)
-    xy = strsplit(keys{es}, ':');
-    x = str2double(xy{2});
-    y = str2double(xy{3});
- %  plot(y,x,'r');
-    
-end
+% figure;
+% imshow(colorFrame);
+% axis on;
+% hold on;
+% 
+% for es = 1 : length(keys)
+%     xy = strsplit(keys{es}, ':');
+%     x = str2double(xy{2});
+%     y = str2double(xy{3});
+%    plot(y,x,'r');
+%     
+% end
 
 boxes = [];
 colorcode=['y';'c';'b'];
 for es = 1 : length(estimate)
     xy = strsplit(keys{estimate(es)}, ':');
+    scale = str2double(xy{1});
     x = str2double(xy{2});
     y = str2double(xy{3});
     
     %//multiply / divide by the scale (xy{1}) for x, y, and boxW, boxH
   % h=rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
-   boxes = vertcat(boxes, [x,y,x+boxW,y+boxH]);
+   boxes = vertcat(boxes, [x,y,x+boxW,y+boxH]/scale);
    
    if net.o(2,estimate(es))>0.99
        col=colorcode(3);
@@ -111,7 +115,7 @@ hold on;
 for es = 1 : length(finalBoxes)
     y = finalBoxes(es, 1); 
     x = finalBoxes(es, 2); 
-    h=rectangle('Position', [x, y,boxW, boxH], 'Tag' , 'hello');
+    h=rectangle('Position', [x, y,80, 150], 'Tag' , 'hello');
     set(h,'EdgeColor','r')
 end
 

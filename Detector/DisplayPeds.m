@@ -15,7 +15,7 @@ frame = rgb2gray(frame);
 framesMap = containers.Map;
 
 %get all the frames from the image...
-scales = [0.125 0.25 0.5]
+scales = [0.25 0.5]
 for h = 1 : length(scales)
     scaledFrame = imresize(frame, scales(h));
     for i = 1 : 5 :(size(scaledFrame, 1) - boxH)
@@ -107,7 +107,7 @@ end
 hold off;
 
 
-finalBoxes = nms(boxes, 0.5);
+finalBoxes = nms(boxes, 0.2);
 
 figure;
 imshow(colorFrame);
@@ -121,7 +121,9 @@ end
 
 hold off;
 
-saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
+validateDetections(frameNumber, finalBoxes, boxW, boxH);
+
+%saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
  
 
 end

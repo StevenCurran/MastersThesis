@@ -1,46 +1,132 @@
- %Format of tracking file: frame-number tneasurerack-number image-position bounding-box-size
+%Format of tracking file: frame-number tneasurerack-number image-position bounding-box-size
 %Format of ground truth file:
 %personNumber, frameNumber, headValid, bodyValid, headLeft, headTop, headRight, headBottom, bodyLeft, bodyTop, bodyRight, bodyBottom
 
-function [mota,motp,precision,recall] = measureMOTAOxford(groundTruth,tracking,verbose)
-       
-    groundTruth = csvread('TownCentre-groundtruth.top');
+function [mota,motp,precision,recall,missedDets,falsePos] = measureMOTAOxford(groundTruth,tracking,verbose,isOxford,produceVideo,videoFilename)
+
+    if isOxford == true
+        groundTruth = csvread('TownCentre-groundtruth.top');
+    else
+        groundTruth = csvread(groundTruth);
+        %groundTruth = csvread('../ground truth/PETS/PETS2009-S2L1-cropped.csv');
+        
+        %groundTruth = csvread('../ground truth/PETS/PETS2009-S2L1_v2.csv'); %- use this for pets
+        %frame trackno x y w h ?
+        
+        %groundTruth2 = csvread('../detections/TUD DETS/ground truth/PETS2009-S2L1.csv'); %- use this for pets
+        %frame trackno x y h w
+        
+%         groundTruth = zeros(size(groundTruth2,1),size(groundTruth2,2)+1);
+%         groundTruth(:,1) = groundTruth2(:,1);
+%         groundTruth(:,2) = groundTruth2(:,2);
+%         groundTruth(:,3) = groundTruth2(:,3) - groundTruth2(:,6)/2;
+%         groundTruth(:,4) = groundTruth2(:,4) - groundTruth2(:,5)/2;
+%         groundTruth(:,5) = groundTruth2(:,6);
+%         groundTruth(:,6) = groundTruth2(:,5);
+        
+        
+        %groundTruth = csvread('../ground truth/TUD/TUD-Stadtmitte2.csv');
+        %groundTruth = csvread('../ground truth/TUD/TUD_stadtmitte_cropped.csv');
+        
+         groundTruth(:,3) =  groundTruth(:,3) * 2;
+         groundTruth(:,4) =  groundTruth(:,4) * 2;
+         groundTruth(:,5) =  groundTruth(:,5) * 2;
+         groundTruth(:,6) =  groundTruth(:,6) * 2;
+         
+         %groundTruth = [10 1 100 100 80 150];
+         %tracking = [10 1 100 100 150 80];
+         
+         tracking(:,[5,6])=tracking(:,[6,5]);
+         
+         
+        
+    end
+
+    %tracking = csvread('example.csv');
     %tracking = csvread('../detections/Oxford Results/TownCentre-output-BenfoldReidCVPR2011.csv');
     %tracking = csvread('../detections/Oxford Results/TownCentre-output-BenfoldReidBMVC2009.csv');
-    
     %tracking = csvread('../../tracker output/trackerOutputMulti_test_linking_1_march_14.csv');
+
+    %     strict settings
+    %     correctAspectRatio = false;
+    %     strictMatching = true;
+    %     matchingThreshold = 0.5;
+
+    %verbose = true;
     
-%     strict settings
-%     correctAspectRatio = false;
+    if isOxford == true
+
+        %Oxford settings
+
+        correctAspectRatio = true;
+        strictMatching = true;
+        matchingThreshold = 0.5;
+
+        topfile = false;
+        petsfile = false;
+
+        %make sure the head is centred in the bounding box
+        correctBBLocation = true;
+
+        %correct for the mismatch betweeen the ground truth frame numbering and
+        %our tracker's output numbering (set to 0 if using official Oxford results).
+        %this is a total hack
+        synchronisationDelay = 3;
+        %synchronisationDelay = 0;
+
+    else
+
+        %PETS 2009 settings
+
+        correctAspectRatio = false;
+        strictMatching = true;
+        matchingThreshold = 0.5;
+
+        topfile = false;
+        petsfile = true;
+
+        %make sure the head is centred in the bounding box
+        correctBBLocation = false;
+
+        %correct for the mismatch betweeen the ground truth frame numbering and
+        %our tracker's output numbering (set to 0 if using Oxford results).
+        synchronisationDelay = 0; %seems to be best for PETS
+
+    end
+    %produceVideo = false;
+    
+    
+%     %TUD settings    
+%     correctAspectRatio = true;
 %     strictMatching = true;
 %     matchingThreshold = 0.5;    
+%     topfile = false;
+%     petsfile = true;    
+%     %make sure the head is centred in the bounding box
+%     correctBBLocation = false;
+%     
+%     %correct for the mismatch betweeen the ground truth frame numbering and
+%     %our tracker's output numbering (set to 0 if using Oxford results).
+%     synchronisationDelay = 0; %seems to be best for PETS
+%     
+%     produceVideo = true;
 
-    verbose = false;
-
-    %my usual settings
-    correctAspectRatio = true;
-    strictMatching = true;
-    matchingThreshold = 0.5;
-        
-    topfile = false;
-    
-    %make sure the head is centred in the bounding box
-    correctBBLocation = true;
-    
-    %correct for the mismatch betweeen the ground truth frame numbering and
-    %our tracker's output numbering (set to 0 if using Oxford results).
-    synchronisationDelay = 3;
-    
-    [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,strictMatching,matchingThreshold,correctAspectRatio,correctBBLocation,synchronisationDelay,verbose)
+%      tracking = csvread('../tracker output/OxfordTest_refactor.csv');
+%      results = [];
+%      verbose = false;
+%      produceVideo = false;
+%     for synchronisationDelay = -10:10
+        [mota,motp,precision,recall,missedDets,falsePos] = doThings(groundTruth,tracking,topfile,petsfile,strictMatching,matchingThreshold,correctAspectRatio,correctBBLocation,synchronisationDelay,verbose,produceVideo,videoFilename);
+%         results = [results; synchronisationDelay mota motp precision recall];
+%     end
     
     %     mota
     %     motp
     %     precision
-    %     recall
-    
+    %     recall    
 end
 
-function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,strictMatching,matchingThreshold,correctAspectRatio,correctBBLocation,syncDelay,verbose)
+function [mota,motp,precision,recall,missedDets,falsePos] = doThings(groundTruth,tracking,topfile,petsfile,strictMatching,matchingThreshold,correctAspectRatio,correctBBLocation,syncDelay,verbose,produceVideo,videoFilename)
 
     %maskImg = imread('mask.png');
     %maskImg = sum(maskImg,3) > 0;
@@ -60,23 +146,38 @@ function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,st
     %tracking = groundTruth;
     %groundTruth = tracking;
     
+    if produceVideo
+        outputVideo = VideoWriter([videoFilename]);
+        outputVideo.FrameRate = floor(30);
+        open(outputVideo);
+    end
+    
+    startFrame = 0;
+    endFrame = 0;
     if topfile == false
         min(tracking(:,1))
         max(tracking(:,1))
+        startFrame = min(tracking(:,1));
+        endFrame = max(tracking(:,1));
     else
         min(tracking(:,2))
         max(tracking(:,2))
+        startFrame = min(tracking(:,2));
+        endFrame = max(tracking(:,2));
     end
+    
+    %startFrame = 1;
+    %endFrame = 794;
     
     %startFrame = 1;%min(tracking(:,1));
     %endFrame = 4500;%max(tracking(:,1));%4500;%4500;%min(startFrame + 1980,4500); %last frame of gt data - 4500
     
-    startFrame = min(tracking(:,1));
-    endFrame = max(tracking(:,1));
+    %startFrame = min(tracking(:,1));
+    %endFrame = max(tracking(:,1));
             
     %endFrame = max(tracking(:,1));
     nFrames = endFrame - startFrame;
-    
+        
     %strictMatching = false;
     
     totalDist = 0;
@@ -92,9 +193,16 @@ function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,st
     t = 1;
     for frame = startFrame:endFrame
         
-        %put condiiton here
-        currentFrameGT = groundTruth(find(groundTruth(:,2) == frame-syncDelay),:);
+        if frame == 50
+            sadf=1;
+        end
         
+        %put condiiton here
+        if petsfile == false
+            currentFrameGT = groundTruth(find(groundTruth(:,2) == frame-syncDelay),:);
+        else
+            currentFrameGT = groundTruth(find(groundTruth(:,1) == frame-syncDelay),:);
+        end
         
         if topfile == false
             currentFrameTF = tracking(find(tracking(:,1) == frame),:);
@@ -103,20 +211,76 @@ function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,st
             currentFrameTF(:,1:2) = fliplr(currentFrameTF(:,1:2));                        
         end
         
+        %remove ground-truth and 
+        try
+            ignoreBorders = false;
+            if ignoreBorders
+                
+                imgSize = [768,576];
+                %imgSize = [1920,1080] ./ 2;
+                borderWidth = 50;
+                
+                toRemove = zeros(1,size(currentFrameGT,1));
+                for v = 1:size(currentFrameGT,1)
+                    
+                    pos = currentFrameGT(v,3:4);
+                    w = currentFrameGT(v,5);
+                    h = currentFrameGT(v,6);
+                    centrePos = pos + ([w,h]./2);
+                    
+                    if centrePos(1) > (imgSize(1) - borderWidth) || ...
+                            centrePos(1) < (borderWidth) || ...
+                            centrePos(2) > (imgSize(2) - borderWidth) || ...
+                            centrePos(2) < (borderWidth) ...
+                            toRemove(v) = 1;
+                    end
+                end
+                currentFrameGT = currentFrameGT(find(toRemove == 0),:);
+                
+                toRemove = zeros(1,size(currentFrameTF,1));
+                for v = 1:size(currentFrameTF,1)
+                    
+                    pos = fliplr(currentFrameTF(v,3:4));
+                    h = currentFrameTF(v,5);
+                    w = currentFrameTF(v,6);
+                    centrePos = pos + ([w,h]./2);
+                    
+                    if centrePos(1) > (imgSize(1) - borderWidth) || ...
+                            centrePos(1) < (borderWidth) || ...
+                            centrePos(2) > (imgSize(2) - borderWidth) || ...
+                            centrePos(2) < (borderWidth) ...
+                            toRemove(v) = 1;
+                    end
+                end
+                currentFrameTF = currentFrameTF(find(toRemove == 0),:);
+                
+            end
+        catch e
+            sdf=1;
+        end
+        
+        if size(currentFrameTF,1) == 0
+            sdf=1;
+        end
+        if size(currentFrameGT,1) == 0
+            asd=1;
+        end
+        
         %[currentFrameGT,currentFrameTF] = filterDets(currentFrameGT,currentFrameTF,maskImg);
         
-        %img = drawGTFrame(currentFrameGT,currentFrameTF);
+        %img = drawGTFrame(frame,currentFrameGT,currentFrameTF);
         %imagesc(img);
+        %drawnow;
         
         %currentFrameTF = tracking(find(tracking(:,1) == frame),:);
         %currentFrameTF = currentFrameGT;
         %currentFrameTF(:,1:2) = fliplr(currentFrameTF(:,1:2));
         
-        %img = drawGTFrame(currentFrameGT,currentFrameTF);
+%         img = drawGTFrame(currentFrameGT,currentFrameTF);
 %         figure;
 %         imagesc(img./max(img(:)));
                         
-        [sMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFrameTF,strictMatching,matchingThreshold,correctAspectRatio,topfile,correctBBLocation);
+        [sMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFrameTF,strictMatching,matchingThreshold,correctAspectRatio,topfile,petsfile,correctBBLocation);
         [matching,matchingOverlap] = greedyMatching(sMatrix,overlapMatrix);
         %This array holds the matches between ground truth and the observed
         %tracks in this frame. We can build this into a current mapping between 
@@ -164,15 +328,20 @@ function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,st
         %anything in the ground truth
         %Check the frame mapping - FP means the observed track is not
         %associated with any of the ground truth tracks
+        falsePositivesMap = zeros(1,size(currentFrameTF,1));
         falsePositives = 0;
+        c=1;
         for i = currentFrameTF(:,2)'            
             if isempty(find(frameMapping(:,2) == i))                
-                falsePositives = falsePositives + 1;                
+                falsePositives = falsePositives + 1; 
+                falsePositivesMap(c) = 1;
             end
+            c=c+1;
         end
                                 
         %missed detections
         missedDetections = sum(frameMapping(:,2) == -1);
+        missedDetectionsMap = frameMapping(:,2) == -1;
                 
         numberOfObjects = size(currentFrameGT,1);% size(frameMapping(:,1),1);
         
@@ -194,28 +363,64 @@ function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,st
         allResults(t,:) = [numberOfObjects missedDetections falsePositives mismatchError sumMatchedOverlap truePositives];
         t = t + 1;
 
-%         if rand() > 0.1
-%             img = drawGTFrame(currentFrameGT,currentFrameTF);
-%             imagesc(img);
-%         end
+        if produceVideo == true
+            %blue - missed detection
+            %red - false positive
+            %green - correctly associated ground-truth
+            %white - correctly associated track            
+            %img = zeros(600,1000,3);
+            %img = zeros(576,768,3);
+            img = zeros(1024/2,1980/2,3);
+            img = drawGTFrame(img,currentFrameGT,missedDetectionsMap,correctBBLocation);
+            img = drawTracksFrame(img,currentFrameTF,falsePositivesMap);
+            
+            %imagesc(img./255);
+            %drawnow;
+            
+            writeVideo(outputVideo,img./max(255,max(img(:))));
+        end
         
-        %Now do things with the mapping
-        
-        %true positives
-        %false positives
-        %missed detections
-        %etc
-        
+%         drawResults = true;
+%         if drawResults
+%             if frame == startFrame
+%                 figure;
+%             end
+%             for g = 1:size(currentFrameGT,1)
+%                [trackNumber,pos,w,h] = parseGroundTruthPETS(currentFrameGT(g,:),0);
+%                if  missedDetectionsMap(g) == 1       
+%                    scatter3(pos(1),pos(2),frame,10,[1 0 0]);
+%                else
+%                    scatter3(pos(1),pos(2),frame,10,[0 1 0]);
+%                end
+%                hold on;
+%             end
+%             for d = 1:size(currentFrameTF,1)
+%                 [trackNumber,pos,w,h] = parseTracking(currentFrameTF(d,:));
+%                 if falsePositivesMap(d) == 1
+%                     scatter3(pos(1),pos(2),frame,10,[0 0 1]);
+%                 else
+%                     scatter3(pos(1),pos(2),frame,10,[0 0 0]);
+%                 end
+%                 hold on;
+%             end
+%        end
+                
     end
     
     %sum(allResults(:,2:4),1) ./ sum(allResults(:,1))
     %[sum(allResults(:,2:4),1) sum(allResults(:,1),1)]
     
-    if verbose == true
-        sum(allResults(:,2))
-        sum(allResults(:,3))
-        sum(allResults(:,4))
-    end
+    %if verbose == true
+        disp(['Missed Dets ' int2str(sum(allResults(:,2)))]);
+        disp(['False Pos   ' int2str(sum(allResults(:,3)))]);
+        disp(['Mismatch    ' int2str(sum(allResults(:,4)))]);
+        %sum(allResults(:,2))
+        %sum(allResults(:,3))
+        %sum(allResults(:,4))
+    %end
+    
+    missedDets = sum(allResults(:,2));
+    falsePos = sum(allResults(:,3));
     
     mota = 1 - (sum(sum(allResults(:,2:4),1)) / sum(allResults(:,1)));    
     %moda = 1 - (sum(sum(allResults(:,2:3),1)) / sum(allResults(:,1)));
@@ -235,6 +440,10 @@ function [mota,motp,precision,recall] = doThings(groundTruth,tracking,topfile,st
         plot(allResults(:,3),'color','green'); %falsePositives
         plot(allResults(:,4),'color','blue');  %mismatchError
         hold off;
+    end
+    
+    if produceVideo
+        close(outputVideo);
     end
     
 end
@@ -264,7 +473,7 @@ end
 %Similarity matrix computed between the positions of all ground truth
 %records and tracks. The similarity is the euclidean distance between their
 %top right corners, if there is at least a 50% overlap
-function [simMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFrameTF,strict,thresh,correctAspectRatio,topfile,correctBBLocations)
+function [simMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFrameTF,strict,thresh,correctAspectRatio,topfile,petsfile,correctBBLocations)
 
     nGround = size(currentFrameGT,1);
     nTracks = size(currentFrameTF,1);
@@ -274,14 +483,18 @@ function [simMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFram
     
     for i = 1:nGround
         
-        [gtrackNumber,gpos,gw,gh] = parseGroundTruth(currentFrameGT(i,:),correctBBLocations);
+        if petsfile == false
+            [gtrackNumber,gpos,gw,gh] = parseGroundTruthOxford(currentFrameGT(i,:),correctBBLocations);
+        else
+            [gtrackNumber,gpos,gw,gh] = parseGroundTruthPETS(currentFrameGT(i,:),correctBBLocations);
+        end
         
         for j = 1:nTracks
             
             if topfile == false
                 [ttrackNumber,tpos,tw,th] = parseTracking(currentFrameTF(j,:));
             else
-                [ttrackNumber,tpos,tw,th] = parseGroundTruth(currentFrameTF(j,:),correctBBLocations);
+                [ttrackNumber,tpos,tw,th] = parseGroundTruthOxford(currentFrameTF(j,:),correctBBLocations);
             end
             
 %             if strict == true
@@ -309,6 +522,7 @@ function [simMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFram
                 end
                 
                 overlap = rectint([gpos gw gh],[tpos tw th]);
+                %overlap = rectint([fliplr(gpos) gh gw],[fliplr(tpos) th tw]);
                 %overlap = overlap / min((tw*th),(gw * gh));
                 union = (tw * th) + (gw * gh) - overlap;
                 
@@ -344,40 +558,6 @@ function [simMatrix,overlapMatrix] = similarityMatrix(currentFrameGT,currentFram
 
 end
 
-%take row from the ground truth file and parse out the info
-function [trackNumber,pos,w,h] = parseGroundTruth(record,correctBBLocations)
-
-    trackNumber = record(1);
-    
-    if correctBBLocations == false
-        % ORIGINAL
-        pos = round(fliplr(record(9:10)) / 2);
-        h = round((record(11) - record(9))/2);
-        w = round((record(12) - record(10))/2);
-    else        
-        % MOD - This code will re-centre the body bounding box
-
-        %get the head position
-        pos = round(fliplr(record(5:6)) / 2);
-        h = round((record(7) - record(5))/2);
-        w = round((record(8) - record(6))/2);
-
-        %get the centre position of the head
-        pos = pos + [h w] ./ 2;
-
-        %get body width / height
-        bh = round((record(11) - record(9))/2);
-        bw = round((record(12) - record(10))/2);
-
-        %move body position back by 1/2 body width
-        pos = pos - [0 bh/2];
-
-        h = bh;
-        w = bw;
-    end
-
-end
-
 %take a row from the tracking file and parse out the info
 function [trackNumber,pos,w,h] = parseTracking(record)
 
@@ -390,48 +570,61 @@ function [trackNumber,pos,w,h] = parseTracking(record)
 
 end
 
-function img = drawGTFrame(frameGT,frameTR)
+function img = drawGTFrame(img,frameGT,missedDetectionsMap,correctBBLocation)
 
-    img = zeros(1080/2,1920/2,3);    
-        
     for i = 1:size(frameGT,1)
-    
-        [trackNumber,pos,w,h] = parseGroundTruth(frameGT(i,:));
-        
-        %correct the aspect ratio
-        cntr = pos + floor([w,h]/2);
-        h = w * 0.5;
-        pos = cntr - [floor(w/2),floor(h/2)];
-        
-        img = drawRect2(img,pos,h,w,[0 1 0]);
 
+        [trackNumber,pos,w,h] = parseGroundTruthPETS(frameGT(i,:),correctBBLocation);%parseGroundTruthOxford(frameGT(i,:),correctBBLocation);
+
+        c = [];
+        if missedDetectionsMap(i) == 1
+            c = [0 0 255];
+        else
+            c = [0 255 0];
+        end
+
+        img = drawRect2(img,pos,h,w,c);
+
+
+        %         htxtins = vision.TextInserter(int2str(trackNumber));
+        %         htxtins.Color = [0, 1, 0]; % [red, green, blue]
+        %         htxtins.FontSize = 12;
+        %         htxtins.Location = fliplr(pos); % [x y]
+        %         img = step(htxtins, img);
+
+    end
+    
+end
+
+function img = drawTracksFrame(img,frameTR,falsePositivesMap)
+
+    %img = zeros(1080/2,1920/2,3);
+        
+    for i = 1:size(frameTR,1)
+        
+        [trackNumber,pos,w,h] = parseTracking(frameTR(i,:));
+        
+        c = [];
+        if falsePositivesMap(i) == 1
+            c = [255 0 0];
+        else
+            c = [255 255 255];
+        end
+        
+%         %correct the aspect ratio
+%         cntr = pos + floor([w,h]/2);
+%         h = w * 0.5;
+%         pos = cntr - [floor(w/2),floor(h/2)];
+
+        tmp = zeros(size(img,1),size(img,2),size(img,3));
+        img = img + drawRect2(tmp,pos,h,w,c);
         
 %         htxtins = vision.TextInserter(int2str(trackNumber));
-%         htxtins.Color = [0, 1, 0]; % [red, green, blue]
+%         htxtins.Color = [0, 255, 0]; % [red, green, blue]
 %         htxtins.FontSize = 12;
 %         htxtins.Location = fliplr(pos); % [x y]
 %         img = step(htxtins, img);
     
-    end
-    
-    for i = 1:size(frameTR,1)
-    
-        [trackNumber,pos,w,h] = parseTracking(frameTR(i,:));
-        %[trackNumber,pos,w,h] = parseGroundTruth(frameTR(i,:));
-        
-        %correct the aspect ratio
-        cntr = pos + floor([w,h]/2);
-        h = w * 0.5;
-        pos = cntr - [floor(w/2),floor(h/2)];
-        
-        img = drawRect2(img,pos,h,w,[0 1 1]);        
-                
-%         htxtins = vision.TextInserter(int2str(trackNumber));
-%         htxtins.Color = [0, 1, 1]; % [red, green, blue]
-%         htxtins.FontSize = 12;
-%         htxtins.Location = fliplr(pos) + [0 20]; % [x y]
-%         img = step(htxtins, img);
-        
     end
     
 end
@@ -451,7 +644,7 @@ function [currentFrameGT,currentFrameTF] = filterDets(frameGT,frameTR,maskImg)
     frameGTKeep = zeros(1,size(frameGT,1));        
     for i = 1:size(frameGT,1)
     
-        [trackNumber,pos,h,w] = parseGroundTruth(frameGT(i,:));
+        [trackNumber,pos,h,w] = parseGroundTruthOxford(frameGT(i,:));
         
         feetPos = round([pos(1) + h,pos(2) + (w/2)]);
         if feetPos(1) > 1 && feetPos(1) < size(img,1) && ...

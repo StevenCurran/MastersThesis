@@ -121,7 +121,7 @@ end
 
 hold off;
 
-validateDetections(frameNumber, finalBoxes, boxW, boxH);
+[mota,motp,precision,recall] = validateDetections(frameNumber, finalBoxes, 80, 150);
 
 %saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
  

@@ -1,4 +1,4 @@
-function [precision,recall] = validateDetections( frameNumber, detectorOutput, width, height )
+function [mota,motp,precision,recall] = validateDetections( frameNumber, detectorOutput, width, height )
 
 
 % frame trackNumber boundingBoxPosition_y boundingBoxPosition_x boundingBoxWidth boundingBoxHeight

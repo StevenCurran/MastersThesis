@@ -15,7 +15,7 @@ frame = rgb2gray(frame);
 framesMap = containers.Map;
 
 %get all the frames from the image...
-scales = [0.25 0.5]
+scales = [0.25 0.33 0.5];
 for h = 1 : length(scales)
     scaledFrame = imresize(frame, scales(h));
     for i = 1 : 5 :(size(scaledFrame, 1) - boxH)
@@ -115,13 +115,15 @@ hold on;
 for es = 1 : length(finalBoxes)
     y = finalBoxes(es, 1); 
     x = finalBoxes(es, 2); 
-    h=rectangle('Position', [x, y,80, 150], 'Tag' , 'hello');
+    y2 = finalBoxes(es, 3);
+    x2 = finalBoxes(es, 4); 
+    h=rectangle('Position', [x, y, y2-y, x2 - x], 'Tag' , 'hello');
     set(h,'EdgeColor','r')
 end
 
 hold off;
 
-[mota,motp,precision,recall] = validateDetections(frameNumber, finalBoxes, 80, 150);
+[mota,motp,precision,recall] = validateDetections(frameNumber, finalBoxes);
 
 %saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
  

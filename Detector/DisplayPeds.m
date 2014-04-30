@@ -1,4 +1,4 @@
-function [] = DisplayPeds(cnn, frame)
+function [finalBoxes] = DisplayPeds(cnn, frame)
 
 frameNumber = frame;
 boxH = 150;
@@ -53,7 +53,7 @@ keys = framesMap.keys();
 
 net = cnnff(cnn, whitenPeople);
 
-estimate = find(net.o(2,:) > 0.9);
+estimate = find(net.o(2,:) > 0.95);
 
 % figure;
 % imshow(colorFrame);
@@ -109,24 +109,26 @@ hold off;
 
 finalBoxes = nms(boxes, 0.2);
 
-figure;
-imshow(colorFrame);
-hold on;
-for es = 1 : length(finalBoxes)
-    y = finalBoxes(es, 1); 
-    x = finalBoxes(es, 2); 
-    y2 = finalBoxes(es, 3);
-    x2 = finalBoxes(es, 4); 
-    h=rectangle('Position', [x, y, y2-y, x2 - x], 'Tag' , 'hello');
-    set(h,'EdgeColor','r')
-end
 
-hold off;
+% figure;
+% imshow(colorFrame);
+% hold on;
+% for es = 1 : length(finalBoxes)
+%     y = finalBoxes(es, 1); 
+%     x = finalBoxes(es, 2); 
+%     y2 = finalBoxes(es, 3);
+%     x2 = finalBoxes(es, 4); 
+%     h=rectangle('Position', [x, y, y2-y, x2 - x], 'Tag' , 'hello');
+%     set(h,'EdgeColor','r')
+% end
+% 
+% hold off;
 
-[mota,motp,precision,recall] = validateDetections(frameNumber, finalBoxes);
+
 
 %saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
  
 
 end
+
 

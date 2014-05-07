@@ -1,11 +1,12 @@
-function [precision,recall] = GetResults(cnn, frameRange)
+function [precision,recall] = GetResults(cnn, frameRange, nms)
 
 decOut = [];
 finalBoxes = [];
 for k = 1:length(frameRange)
     frame = frameRange(k);
-    frameBoxes = DisplayPeds(cnn, frame);
-    
+    disp(strcat('working', num2str(frame)));
+    frameBoxes = DisplayPeds(cnn, frame, nms);
+    disp(strcat('done', num2str(frame)));
     % frame trackNumber boundingBoxPosition_y boundingBoxPosition_x boundingBoxWidth boundingBoxHeight
 
 for i = 1 : length(frameBoxes)
@@ -21,4 +22,5 @@ end
 [~,~,precision,recall] = validateDetections(decOut);
 precision
 recall
+save('3000_3500_results2.mat', 'precision', 'recall');
 end

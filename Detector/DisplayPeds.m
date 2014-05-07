@@ -1,4 +1,4 @@
-function [finalBoxes] = DisplayPeds(cnn, frame)
+function [finalBoxes] = DisplayPeds(cnn, frame, nmsVal)
 
 frameNumber = frame;
 boxH = 150;
@@ -15,11 +15,11 @@ frame = rgb2gray(frame);
 framesMap = containers.Map;
 
 %get all the frames from the image...
-scales = [0.25 0.33 0.5];
+scales = [0.33 0.5];
 for h = 1 : length(scales)
     scaledFrame = imresize(frame, scales(h));
-    for i = 1 : 5 :(size(scaledFrame, 1) - boxH)
-        for j = 1 : 5 :(size(scaledFrame , 2)-boxW)
+    for i = 1 : 10 :(size(scaledFrame, 1) - boxH)
+        for j = 1 : 10 :(size(scaledFrame , 2)-boxW)
             image = scaledFrame(i:i+boxH-1, j:j+boxW-1);
             image = double(image)/255;
             %image = imresize(image, [52 32]);
@@ -38,10 +38,10 @@ testImages = ConvertFromCellArray(framesMap.values);
 
 zcaPeople = reshape(testImages, 52*32, length(testImages));
 
-for i = 1:length(zcaPeople)
-    %whitenPeople(i) = zcaWhiten(zcaPeople(i,:));
-    whitenPeople(i,:) = 10;
-end
+% for i = 1:length(zcaPeople)
+%     %whitenPeople(i) = zcaWhiten(zcaPeople(i,:));
+%     whitenPeople(i,:) = 10;
+% end
 
 whitenPeople = zcaWhiten(zcaPeople);
 whitenPeople = reshape(whitenPeople, 52,32,length(testImages));
@@ -91,23 +91,23 @@ for es = 1 : length(estimate)
     
 end
 
-%boxes = [];
-for es = 1 : length(net.o(2,:))
-    xy = strsplit(keys{es}, ':');
-    x = str2double(xy{2});
-    y = str2double(xy{3});
-    x2 = ceil(x/15); % this is the dimenson of the box
-    y2 = ceil(y/15);
-    map(y2,x2)=net.o(2,es);
-%    boxes = vertcat(boxes, [x,y,x2,y2]);
-    
- %rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
-end
+% %boxes = [];
+% for es = 1 : length(net.o(2,:))
+%     xy = strsplit(keys{es}, ':');
+%     x = str2double(xy{2});
+%     y = str2double(xy{3});
+%     x2 = ceil(x/15); % this is the dimenson of the box
+%     y2 = ceil(y/15);
+%     map(y2,x2)=net.o(2,es);
+% %    boxes = vertcat(boxes, [x,y,x2,y2]);
+%     
+%  %rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
+% end
+% 
+% hold off;
 
-hold off;
 
-
-finalBoxes = nms(boxes, 0.2);
+finalBoxes = nms(boxes, nmsVal);
 
 
 % figure;
@@ -128,6 +128,10 @@ finalBoxes = nms(boxes, 0.2);
 
 %saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
  
+% img = read(movie,[3000 4500]);
+% for ii = 1:1501
+%     imwrite(img(:,:,:,ii),sprintf('OutputImages/img%d.png',ii));
+% end
 
 end
 

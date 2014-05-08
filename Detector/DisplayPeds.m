@@ -110,19 +110,19 @@ end
 finalBoxes = nms(boxes, nmsVal);
 
 
-% figure;
-% imshow(colorFrame);
-% hold on;
-% for es = 1 : length(finalBoxes)
-%     y = finalBoxes(es, 1); 
-%     x = finalBoxes(es, 2); 
-%     y2 = finalBoxes(es, 3);
-%     x2 = finalBoxes(es, 4); 
-%     h=rectangle('Position', [x, y, y2-y, x2 - x], 'Tag' , 'hello');
-%     set(h,'EdgeColor','r')
-% end
-% 
-% hold off;
+figure;
+imshow(colorFrame);
+hold on;
+for es = 1 : length(finalBoxes)
+    y = finalBoxes(es, 1); 
+    x = finalBoxes(es, 2); 
+    y2 = finalBoxes(es, 3);
+    x2 = finalBoxes(es, 4); 
+    h=rectangle('Position', [x, y, y2-y, x2 - x], 'Tag' , 'hello');
+    set(h,'EdgeColor','r')
+end
+
+hold off;
 
 
 

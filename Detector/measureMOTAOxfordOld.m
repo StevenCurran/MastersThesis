@@ -2,7 +2,7 @@
 %Format of ground truth file:
 %personNumber, frameNumber, headValid, bodyValid, headLeft, headTop, headRight, headBottom, bodyLeft, bodyTop, bodyRight, bodyBottom
 
-function [mota,motp,precision,recall,missedDets,falsePos] = measureMOTAOxford(groundTruth,tracking,verbose,isOxford,produceVideo,videoFilename)
+function [mota,motp,precision,recall,missedDets,falsePos] = measureMOTAOxfordOld(groundTruth,tracking,verbose,isOxford,produceVideo,videoFilename)
 
     if isOxford == true
         groundTruth = csvread('TownCentre-groundtruth.top');
@@ -359,14 +359,7 @@ function [mota,motp,precision,recall,missedDets,falsePos] = doThings(groundTruth
                 sumMatchedOverlap = sumMatchedOverlap + frameMapping(f(1,1),3);
             end
         end
-        
-        TP = length(find(matching~=0));
-        FN = size(currentFrameGT,1) - TP;
-        FP = size(currentFrameTF,1) - TP;
-        truePositives = TP;
-        missedDetections = FN;
-        falsePositives = FP;
-              
+           
         allResults(t,:) = [numberOfObjects missedDetections falsePositives mismatchError sumMatchedOverlap truePositives];
         t = t + 1;
 

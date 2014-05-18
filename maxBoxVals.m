@@ -16,11 +16,6 @@ overlaps = rectint(rects, rects);
 [r,c] = find(overlaps > 0);
 localBoxes = [];
 
-for i = 1 : length(r)
-    
-    
-end
-
 for i = 1 : length(overlaps)
     col = overlaps(:,i);
     col2 = find(col > 0);
@@ -30,7 +25,9 @@ for i = 1 : length(overlaps)
     end
     localRects = [rects(i,:)];
     for j = 1 : length(col2)
-        localRects = [localRects ; rects(col2(j),:)];
+        if(j ~= i)
+            localRects = [localRects ; rects(col2(j),:)];
+        end
     end
     
     if(max(localRects) > 0)
@@ -38,7 +35,7 @@ for i = 1 : length(overlaps)
         minY = min(localRects(:,2));
         maxX = max(localRects(:,1))+max(localRects(:,3));
         maxY = max(localRects(:,2))+max(localRects(:,4));
-        localBoxes = [localBoxes ; [minX,minY,abs(maxX - minX), abs(maxY - minY)]];
+        localBoxes = [localBoxes ; [minX,minY,maxX - minX, maxY - minY]];
     end
     
 end

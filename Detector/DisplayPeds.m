@@ -1,4 +1,4 @@
-function [finalBoxes] = DisplayPeds(cnn, frame, nmsVal)
+function [finalBoxes] = DisplayPeds(cnn, frame, scales)
 
 frameNumber = frame;
 boxH = 150;
@@ -91,25 +91,27 @@ for es = 1 : length(estimate)
     
 end
 
-% %boxes = [];
-% for es = 1 : length(net.o(2,:))
-%     xy = strsplit(keys{es}, ':');
-%     x = str2double(xy{2});
-%     y = str2double(xy{3});
-%     x2 = ceil(x/15); % this is the dimenson of the box
-%     y2 = ceil(y/15);
-%     map(y2,x2)=net.o(2,es);
-% %    boxes = vertcat(boxes, [x,y,x2,y2]);
-%     
-%  %rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
-% end
+%boxes = [];
+for es = 1 : length(net.o(2,:))
+    xy = strsplit(keys{es}, ':');
+    x = str2double(xy{2});
+    y = str2double(xy{3});
+    x2 = ceil(x/15); % this is the dimenson of the box
+    y2 = ceil(y/15);
+    map(y2,x2)=net.o(2,es);
+%    boxes = vertcat(boxes, [x,y,x2,y2]);
+    
+ %rectangle('Position', [y, x,boxW, boxH], 'Tag' , 'hello');
+end
+
+hold off;
+
+%surf(map);
+
+
+finalBoxes = nms(boxes, 0.5);
+%finalBoxes = boxes;
 % 
-% hold off;
-
-
-finalBoxes = nms(boxes, nmsVal);
-
-
 figure;
 imshow(colorFrame);
 hold on;
@@ -122,11 +124,26 @@ for es = 1 : length(finalBoxes)
     set(h,'EdgeColor','r')
 end
 
+finalBoxes2 = maxBoxVals(finalBoxes);
+backup = finalBoxes2
+finalBoxes2(:,[1,2])=finalBoxes2(:,[2,1]);%have to flip columns here, not sure why
+
+figure
+imshow(colorFrame)
+for es = 1 : length(finalBoxes2)
+    y = finalBoxes2(es, 1); 
+    x = finalBoxes2(es, 2); 
+    y2 = finalBoxes2(es, 3);
+    x2 = finalBoxes2(es, 4); 
+    %h=rectangle('Position', finalBoxes2(es,:), 'Tag' , 'hello');
+    h=rectangle('Position', [x, y, y2, x2], 'Tag' , 'hello');
+    set(h,'EdgeColor','g')
+end
+
 hold off;
-
-
-
-%saveas(gcf,strcat('detector_output/detector', num2str(frameNumber)),'png'); 
+% 
+% saveas(gcf,strcat('OutputVideoBoxCom/frame', num2str(frameNumber)),'png'); 
+% close all;
  
 % img = read(movie,[3000 4500]);
 % for ii = 1:1501
